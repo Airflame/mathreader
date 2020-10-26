@@ -29,9 +29,10 @@ class Network:
         @param input_size: Size of input vectors
         """
         self.neurons = neurons
+        self.layers = len(neurons)
         self.input_size = input_size
-        self.W = []   #network weights
-        self.B = []   #network biases
+        self.weights = []
+        self.biases = []
 
     def fit(self, iterations, input_data, input_labels):
         """
@@ -40,53 +41,44 @@ class Network:
         @param input_data: List of training data vectors with shape (input_size, 1)
         @param input_labels: List of training labels with shape (neurons[-1], 1)
         """
-        self.W = [np.random.rand(self.neurons[0], self.input_size) - 0.5,
-                  np.random.rand(self.neurons[1], self.neurons[0]) - 0.5,
-                  np.random.rand(self.neurons[2], self.neurons[1]) - 0.5]
-        self.B = [np.random.rand(self.neurons[0], 1),
-                  np.random.rand(self.neurons[1], 1),
-                  np.random.rand(self.neurons[2], 1)]
-        S = [np.zeros((self.neurons[0], 1)),
-             np.zeros((self.neurons[1], 1)),
-             np.zeros((self.neurons[2], 1))]  #outputs of layers
-        U = [np.zeros((self.neurons[0], 1)),
-             np.zeros((self.neurons[1], 1)),
-             np.zeros((self.neurons[2], 1))]  #outputs of layers with applied sigmoid
-        D = [np.zeros((self.neurons[0], 1)),
-             np.zeros((self.neurons[1], 1)),
-             np.zeros((self.neurons[2], 1))]  #backpropagated error
-
+        self.weights = [np.random.rand(self.neurons[0], self.input_size) - 0.5]
+        self.biases = []
+        activations = []
+        errors = []
+        derivatives = []
+        for i in range(self.layers - 1):
+            self.weights.append(np.random.rand(self.neurons[i + 1], self.neurons[i]) - 0.5)
+        for i in range(self.layers):
+            self.biases.append(np.random.rand(self.neurons[i], 1))
+            activations.append(np.zeros((self.neurons[i], 1)))
+            errors.append(np.zeros((self.neurons[i], 1)))
+            derivatives.append(np.zeros((self.neurons[i], 1)))
         ro = 1
-        F = [np.zeros((self.neurons[0], 1)),
-             np.zeros((self.neurons[1], 1)),
-             np.zeros((self.neurons[2], 1))]  #derivatives of sigmoid function
 
-        for i in range(iterations):
-            E = np.array(input_data[i % len(input_data)]).reshape(35, 1)
-            C = np.array(input_labels[i % len(input_data)]).reshape(17, 1)
-            S[0] = self.W[0] @ E + self.B[0]
-            U[0] = sigmoid(S[0])
-            S[1] = self.W[1] @ U[0] + self.B[1]
-            U[1] = sigmoid(S[1])
-            S[2] = self.W[2] @ U[1] + self.B[2]
-            U[2] = sigmoid(S[2])
+        for iteration in range(iterations):
+            sample = iteration % len(input_data)
+            input_vector = np.array(input_data[sample]).reshape(35, 1)
+            input_label = np.array(input_labels[sample]).reshape(17, 1)
+            
+            activations[0] = sigmoid(self.weights[0] @ input_vector + self.biases[0])
+            for i in range(self.layers - 1):
+                activations[i + 1] = sigmoid(self.weights[i + 1] @ activations[i] + self.biases[i + 1])
 
-            for j in range(len(F)):
-                F[j] = sigmoid_derivative(U[j])
+            for i in range(len(derivatives)):
+                derivatives[i] = sigmoid_derivative(activations[i])
+            errors[self.layers - 1] = (input_label - activations[self.layers - 1]) * derivatives[self.layers - 1]
+            for i in range(self.layers - 2, 0, -1):
+                errors[i] = (self.weights[i + 1].transpose() @ errors[i + 1]) * derivatives[i]
 
-            D[2] = (C - U[2]) * F[2]
-            D[1] = (self.W[2].transpose() @ D[2]) * F[1]
-            D[0] = (self.W[1].transpose() @ D[1]) * F[0]
-
-            self.W[2] = self.W[2] + ro * np.multiply(np.tile(D[2], (1, self.W[2].shape[1])),
-                                                     np.tile(U[1].transpose(), (self.W[2].shape[0], 1)))
-            self.B[2] = self.B[2] + ro * D[2]
-            self.W[1] = self.W[1] + ro * np.multiply(np.tile(D[1], (1, self.W[1].shape[1])),
-                                                     np.tile(U[0].transpose(), (self.W[1].shape[0], 1)))
-            self.B[1] = self.B[1] + ro * D[1]
-            self.W[0] = self.W[0] + ro * np.multiply(np.tile(D[0], (1, self.W[0].shape[1])),
-                                                     np.tile(E.transpose(), (self.W[0].shape[0], 1)))
-            self.B[0] = self.B[0] + ro * D[0]
+            self.weights[0] += ro * np.multiply(
+                np.tile(errors[0], (1, self.weights[0].shape[1])),
+                np.tile(input_vector.transpose(), (self.weights[0].shape[0], 1)))
+            self.biases[0] += ro * errors[0]
+            for i in range(1, self.layers):
+                self.weights[i] += ro * np.multiply(
+                    np.tile(errors[i], (1, self.weights[i].shape[1])),
+                    np.tile(activations[i - 1].transpose(), (self.weights[i].shape[0], 1)))
+                self.biases[i] += ro * errors[i]
 
     def evaluate(self, input_vector) -> int:
         """
@@ -95,11 +87,11 @@ class Network:
         @return: Index of a class assigned by the network
         """
         input_vector = np.array(input_vector).reshape(35, 1)
-        U = sigmoid(self.W[0] @ input_vector + self.B[0])
-        U = sigmoid(self.W[1] @ U + self.B[1])
-        U = sigmoid(self.W[2] @ U + self.B[2])
+        activations = sigmoid(self.weights[0] @ input_vector + self.biases[0])
+        for i in range(1, self.layers):
+            activations = sigmoid(self.weights[i] @ activations + self.biases[i])
 
-        index = int(U.argmax(axis=0))
-        print(str(int(U.argmax(axis=0))) + ": " + str(float(U[index]) * 100))
+        index = int(activations.argmax(axis=0))
+        print(str(int(activations.argmax(axis=0))) + ": " + str(float(activations[index]) * 100))
         print()
         return index
