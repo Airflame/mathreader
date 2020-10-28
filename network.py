@@ -56,9 +56,11 @@ class Network:
         ro = 1
 
         for iteration in range(iterations):
+            if iteration % 500 == 0:
+                print(iteration/iterations)
             sample = iteration % len(input_data)
-            input_vector = np.array(input_data[sample]).reshape(35, 1)
-            input_label = np.array(input_labels[sample]).reshape(17, 1)
+            input_vector = np.array(input_data[sample]).reshape(self.input_size, 1)
+            input_label = np.array(input_labels[sample]).reshape(self.neurons[-1], 1)
             
             activations[0] = sigmoid(self.weights[0] @ input_vector + self.biases[0])
             for i in range(self.layers - 1):
@@ -86,7 +88,7 @@ class Network:
         @param input_vector: Input vector with shape (input_size, 1)
         @return: Index of a class assigned by the network
         """
-        input_vector = np.array(input_vector).reshape(35, 1)
+        input_vector = np.array(input_vector).reshape(self.input_size, 1)
         activations = sigmoid(self.weights[0] @ input_vector + self.biases[0])
         for i in range(1, self.layers):
             activations = sigmoid(self.weights[i] @ activations + self.biases[i])
