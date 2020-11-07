@@ -51,7 +51,13 @@ class Network:
             activations.append(np.zeros((self.neurons[i], 1)))
             errors.append(np.zeros((self.neurons[i], 1)))
             derivatives.append(np.zeros((self.neurons[i], 1)))
+        diff_weights = [np.zeros((self.neurons[0], self.input_size))]
+        diff_biases = [np.zeros((self.neurons[0], 1))]
+        for i in range(self.layers - 1):
+            diff_weights.append(np.zeros((self.neurons[i + 1], self.neurons[i])))
+            diff_biases.append(np.zeros((self.neurons[i + 1], 1)))
         ro = 0.2
+        alpha = 0.9
 
         for iteration in range(iterations):
             if iteration % 500 == 0:
@@ -70,15 +76,19 @@ class Network:
             for i in range(self.layers - 2, 0, -1):
                 errors[i] = (self.weights[i + 1].transpose() @ errors[i + 1]) * derivatives[i]
 
-            self.weights[0] += ro * np.multiply(
+            diff_weights[0] = ro * np.multiply(
                 np.tile(errors[0], (1, self.weights[0].shape[1])),
-                np.tile(input_vector.transpose(), (self.weights[0].shape[0], 1)))
-            self.biases[0] += ro * errors[0]
+                np.tile(input_vector.transpose(), (self.weights[0].shape[0], 1))) + alpha * diff_weights[0]
+            self.weights[0] += diff_weights[0]
+            diff_biases[0] = ro * errors[0] + alpha * diff_biases[0]
+            self.biases[0] += diff_biases[0]
             for i in range(1, self.layers):
-                self.weights[i] += ro * np.multiply(
+                diff_weights[i] = ro * np.multiply(
                     np.tile(errors[i], (1, self.weights[i].shape[1])),
-                    np.tile(activations[i - 1].transpose(), (self.weights[i].shape[0], 1)))
-                self.biases[i] += ro * errors[i]
+                    np.tile(activations[i - 1].transpose(), (self.weights[i].shape[0], 1))) + alpha * diff_weights[i]
+                self.weights[i] += diff_weights[i]
+                diff_biases[i] = ro * errors[i] + alpha * diff_biases[i]
+                self.biases[i] += diff_biases[i]
 
     def evaluate(self, input_vector) -> int:
         """
