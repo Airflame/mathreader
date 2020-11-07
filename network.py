@@ -35,7 +35,7 @@ class Network:
         self.biases = [np.random.rand(self.neurons[0], 1)]
         for i in range(self.layers - 1):
             self.weights.append(np.random.rand(self.neurons[i + 1], self.neurons[i]) - 0.5)
-            self.biases.append(np.random.rand(self.neurons[i], 1))
+            self.biases.append(np.random.rand(self.neurons[i + 1], 1))
 
     def fit(self, iterations, input_data, input_labels) -> None:
         """

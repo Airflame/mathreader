@@ -19,11 +19,8 @@ for i in range(len(C)):
 C *= fonts
 
 network = Network(neurons=(35, 25, 17), input_size=21*14)
-network.load("weights")
-for layer in range(network.layers):
-    print(network.weights[layer].shape)
-    print(network.biases[layer].shape)
-# network.fit(iterations=300000, input_data=E, input_labels=C)
+#network.load("weights")
+network.fit(iterations=30000, input_data=E, input_labels=C)
 
 # R = [E[5], E[10], E[3], E[10], E[2]]
 R = E
@@ -38,7 +35,7 @@ for i in range(len(R)):
 # plt.show()
 print(formula+" -> +str(eval(formula))")
 
-img = cv2.cvtColor(cv2.imread('data/resize.png'), cv2.COLOR_BGR2GRAY) / 255
+img = cv2.cvtColor(cv2.imread('data/resize6.png'), cv2.COLOR_BGR2GRAY) / 255
 img = cv2.resize(img, (14, 21))
 plt.imshow(np.array(img).reshape(21, 14))
 plt.show()
