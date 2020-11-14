@@ -56,8 +56,8 @@ class Network:
         for i in range(self.layers - 1):
             diff_weights.append(np.zeros((self.neurons[i + 1], self.neurons[i])))
             diff_biases.append(np.zeros((self.neurons[i + 1], 1)))
-        ro = 0.2
-        alpha = 0.9
+        ro = 0.5
+        alpha = 0
 
         for iteration in range(iterations):
             if iteration % 500 == 0:
