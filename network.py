@@ -28,6 +28,7 @@ class Network:
         @param neurons: Tuple containing the number of neurons in consecutive layers
         @param input_size: Size of input vectors
         """
+        print("{ Initializing network with layers of sizes " + str(neurons) + " }")
         self.neurons = neurons
         self.layers = len(neurons)
         self.input_size = input_size
@@ -44,6 +45,7 @@ class Network:
         @param input_data: List of training data vectors with shape (input_size, 1)
         @param input_labels: List of training labels with shape (neurons[-1], 1)
         """
+        print("{ Training network for " + str(iterations) + " iterations and " + str(len(input_data)) + " samples }")
         activations = []
         errors = []
         derivatives = []
@@ -111,6 +113,7 @@ class Network:
         Saves network parameters to a csv file.
         @param file_name: The file will be created in ./data/<file_name>.csv
         """
+        print("{ Saving weights to file " + file_name + ".csv }")
         with open('data/' + str(file_name) + '.csv', 'ab') as f:
             for layer in range(self.layers):
                 np.savetxt(f, self.weights[layer], delimiter=',')
@@ -121,6 +124,7 @@ class Network:
         Loads network parameters from a csv file.
         @param file_name: The file will be loaded from ./data/<file_name>.csv
         """
+        print("{ Loading weights from file " + file_name + ".csv }")
         skip_header = 0
         skip_footer = 2*sum(self.neurons)
         for layer in range(self.layers):
