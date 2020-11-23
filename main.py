@@ -24,7 +24,7 @@ network.load("weights")
 
 #R = [E[5], E[10], E[3], E[10], E[2]]
 #R = E
-image = cv2.imread('data/formula.png')
+image = cv2.imread('data/formula2.png')
 R = processing.extract_symbols(image)
 
 formula = ""
