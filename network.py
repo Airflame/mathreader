@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 
 def sigmoid(arr):
@@ -38,12 +39,14 @@ class Network:
             self.weights.append(np.random.rand(self.neurons[i + 1], self.neurons[i]) - 0.5)
             self.biases.append(np.random.rand(self.neurons[i + 1], 1))
 
-    def fit(self, iterations, input_data, input_labels) -> None:
+    def fit(self, iterations, input_data, input_labels, ro=0.5, alpha=0.5) -> None:
         """
         Trains network with given training data and corresponding labels
         @param iterations: Number of total iterations the networks
         @param input_data: List of training data vectors with shape (input_size, 1)
         @param input_labels: List of training labels with shape (neurons[-1], 1)
+        @param ro:
+        @param alpha:
         """
         print("{ Training network for " + str(iterations) + " iterations and " + str(len(input_data)) + " samples }")
         activations = []
@@ -58,13 +61,15 @@ class Network:
         for i in range(self.layers - 1):
             diff_weights.append(np.zeros((self.neurons[i + 1], self.neurons[i])))
             diff_biases.append(np.zeros((self.neurons[i + 1], 1)))
-        ro = 0.5
-        alpha = 0
+
+        samples = list(range(len(input_data)))
 
         for iteration in range(iterations):
             if iteration % 500 == 0:
                 print(iteration / iterations)
-            sample = iteration % len(input_data)
+            if iteration % len(input_data) == 0:
+                random.shuffle(samples)
+            sample = samples[iteration % len(input_data)]
             input_vector = np.array(input_data[sample]).reshape(self.input_size, 1)
             input_label = np.array(input_labels[sample]).reshape(self.neurons[-1], 1)
 

@@ -18,14 +18,14 @@ for i in range(len(C)):
 C *= fonts
 
 network = Network(neurons=(35, 25, len(symbols)), input_size=21*14)
-network.load("weights")
-#network.fit(iterations=20000, input_data=E, input_labels=C)
+#network.load("weights")
+network.fit(iterations=10000, input_data=E, input_labels=C)
 #network.save("weights")
 
 #R = [E[5], E[10], E[3], E[10], E[2]]
-#R = E
-image = cv2.imread('data/formula2.png')
-R = processing.extract_symbols(image)
+R = E
+image = cv2.imread('data/formula.png')
+#R = processing.extract_symbols(image)
 
 formula = ""
 for i in range(len(R)):
@@ -35,5 +35,5 @@ for i in range(len(R)):
 
 # plt.imshow(np.array(img).reshape(21, 14))
 # plt.show()
-print(formula+" -> "+str(eval(formula)))
+#print(formula+" -> "+str(eval(formula)))
 
