@@ -1,25 +1,6 @@
 import numpy as np
 import random
-
-
-def sigmoid(arr):
-    """
-    Applies sigmoid function to all elements in a numpy array
-    f(s) = 1/(1+exp(-s))
-    @param arr: Input array
-    @return: Output array
-    """
-    return np.array(list(map(lambda s: 1 / (1 + np.exp(-s)), arr)))
-
-
-def sigmoid_derivative(arr):
-    """
-    Applies derivative of sigmoid function to all elements in a numpy array with applied sigmoid
-    f'(u) = u*(1-u)
-    @param arr: Input array (outputs from sigmoid function)
-    @return: Output array
-    """
-    return np.array(list(map(lambda u: u * (1 - u), arr)))
+from functions import Functions
 
 
 class Network:
@@ -73,12 +54,12 @@ class Network:
             input_vector = np.array(input_data[sample]).reshape(self.input_size, 1)
             input_label = np.array(input_labels[sample]).reshape(self.neurons[-1], 1)
 
-            activations[0] = sigmoid(self.weights[0] @ input_vector + self.biases[0])
+            activations[0] = Functions.sigmoid(self.weights[0] @ input_vector + self.biases[0])
             for i in range(self.layers - 1):
-                activations[i + 1] = sigmoid(self.weights[i + 1] @ activations[i] + self.biases[i + 1])
+                activations[i + 1] = Functions.sigmoid(self.weights[i + 1] @ activations[i] + self.biases[i + 1])
 
             for i in range(len(derivatives)):
-                derivatives[i] = sigmoid_derivative(activations[i])
+                derivatives[i] = Functions.sigmoid_derivative(activations[i])
             errors[self.layers - 1] = (input_label - activations[self.layers - 1]) * derivatives[self.layers - 1]
             for i in range(self.layers - 2, 0, -1):
                 errors[i] = (self.weights[i + 1].transpose() @ errors[i + 1]) * derivatives[i]
@@ -104,9 +85,9 @@ class Network:
         @return: Index of a class assigned by the network
         """
         input_vector = np.array(input_vector).reshape(self.input_size, 1)
-        activations = sigmoid(self.weights[0] @ input_vector + self.biases[0])
+        activations = Functions.sigmoid(self.weights[0] @ input_vector + self.biases[0])
         for i in range(1, self.layers):
-            activations = sigmoid(self.weights[i] @ activations + self.biases[i])
+            activations = Functions.sigmoid(self.weights[i] @ activations + self.biases[i])
 
         index = int(activations.argmax(axis=0))
         print(str(int(activations.argmax(axis=0))) + ": " + str(float(activations[index]) * 100))
