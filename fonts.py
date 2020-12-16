@@ -10,7 +10,7 @@ class Fonts:
         self.labels = [[0]*len(Constants.symbols) for _ in range(len(Constants.symbols))]
 
     def load(self) -> None:
-        print("[ Loading " + str(self.fonts) + " fonts ]")
+        # print("[ Loading " + str(self.fonts) + " fonts ]")
         for font in range(self.fonts):
             image = cv2.imread('data/font' + str(font) + '.png')
             self.data.extend(Processing.extract_segments(image))

@@ -10,7 +10,7 @@ class Network:
         @param neurons: Tuple containing the number of neurons in consecutive layers
         @param input_size: Size of input vectors
         """
-        print("{ Initializing network with layers of sizes " + str(neurons) + " }")
+        # print("{ Initializing network with layers of sizes " + str(neurons) + " }")
         self.neurons = neurons
         self.layers = len(neurons)
         self.input_size = input_size
@@ -46,8 +46,9 @@ class Network:
         samples = list(range(len(input_data)))
 
         for iteration in range(iterations):
-            if iteration % 500 == 0:
-                print(iteration / iterations)
+            # if iteration % 500 == 0:
+            #       self.progress = ((iteration / iterations)+ (500/ iterations))*100%
+            #     print(iteration / iterations)
             if iteration % len(input_data) == 0:
                 random.shuffle(samples)
             sample = samples[iteration % len(input_data)]
@@ -99,7 +100,7 @@ class Network:
         Saves network parameters to a csv file.
         @param file_name: The file will be created in ./data/<file_name>.csv
         """
-        print("{ Saving weights to file " + file_name + ".csv }")
+        # print("{ Saving weights to file " + file_name + ".csv }")
         with open('data/' + str(file_name) + '.csv', 'ab') as f:
             for layer in range(self.layers):
                 np.savetxt(f, self.weights[layer], delimiter=',')
@@ -110,7 +111,7 @@ class Network:
         Loads network parameters from a csv file.
         @param file_name: The file will be loaded from ./data/<file_name>.csv
         """
-        print("{ Loading weights from file " + file_name + ".csv }")
+        # print("{ Loading weights from file " + file_name + ".csv }")
         skip_header = 0
         skip_footer = 2*sum(self.neurons)
         for layer in range(self.layers):
