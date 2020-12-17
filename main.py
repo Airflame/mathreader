@@ -112,6 +112,25 @@ class MathReader(QWidget):
         grid.setSpacing(10)
         self.setLayout(grid)
 
+        self.training_dialog.setModal(True)
+        self.training_dialog.setWindowTitle("Training Dialog")
+        self.training_dialog.setWindowIcon(QIcon('res/icon.png'))
+        grid = QGridLayout()
+        self.btn_apply.clicked.connect(self.get_training_params)
+        self.training_dialog.setFixedSize(230, 150)
+
+        grid.addWidget(self.training_params, 0, 0, 1, 2)
+        grid.addWidget(self.separator_h, 1, 0, 1, 2)
+        grid.addWidget(self.choose_iterations_label, 2, 0)
+        grid.addWidget(self.choose_iterations_input, 2, 1)
+        grid.addWidget(self.choose_alpha_label, 3, 0)
+        grid.addWidget(self.choose_alpha_input, 3, 1)
+        grid.addWidget(self.choose_rho_label, 4, 0)
+        grid.addWidget(self.choose_rho_input, 4, 1)
+        grid.addWidget(self.btn_apply, 5, 0, 1, 2, Qt.AlignCenter)
+
+        self.training_dialog.setLayout(grid)
+
     def open_file(self):
         file_name, _ = QFileDialog.getOpenFileName(self, 'Open file')
         self.browsed_file.setText(file_name)
@@ -148,25 +167,6 @@ class MathReader(QWidget):
             self.label_state.setText("Please train network or load weights first.")
 
     def open_training_dialog(self):
-        self.training_dialog.setModal(True)
-        self.training_dialog.setWindowTitle("Training Dialog")
-        self.training_dialog.setWindowIcon(QIcon('res/icon.png'))
-        grid = QGridLayout()
-        self.btn_apply.clicked.connect(self.get_training_params)
-        self.training_dialog.setFixedSize(230, 150)
-
-        grid.addWidget(self.training_params, 0, 0, 1, 2)
-        grid.addWidget(self.separator_h, 1, 0, 1, 2)
-        grid.addWidget(self.choose_iterations_label, 2, 0)
-        grid.addWidget(self.choose_iterations_input, 2, 1)
-        grid.addWidget(self.choose_alpha_label, 3, 0)
-        grid.addWidget(self.choose_alpha_input, 3, 1)
-        grid.addWidget(self.choose_rho_label, 4, 0)
-        grid.addWidget(self.choose_rho_input, 4, 1)
-        grid.addWidget(self.btn_apply, 5, 0, 1, 2, Qt.AlignCenter)
-
-        self.training_dialog.setLayout(grid)
-
         self.training_dialog.exec()
 
     def get_training_params(self):
@@ -174,7 +174,7 @@ class MathReader(QWidget):
         self.ro = float(self.choose_rho_input.text())
         self.alpha = float(self.choose_alpha_input.text())
         self.training_dialog.close()
-        t = threading.Thread(name='training', target=Network.fit, args=(self.network, self.iterations,
+        t = threading.Thread(target=self.network.fit, args=(self.iterations,
                                                                         self.fonts.data, self.fonts.labels,
                                                                         self.ro, self.alpha, self.set_progress_bar))
         t.start()
