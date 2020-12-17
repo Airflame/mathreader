@@ -26,7 +26,7 @@ class MathReader(QWidget):
         self.setWindowTitle("MathReader")
         self.setWindowIcon(QIcon('res/icon.png'))
         grid = QGridLayout()
-        self.setGeometry(595, 290, 730, 500)
+        self.setFixedSize(730, 500)
 
         label_math_reader = QLabel("MathReader")
         label_math_reader.setFont(QFont("Ink Free", 20, QFont.Bold))
@@ -153,7 +153,7 @@ class MathReader(QWidget):
         self.training_dialog.setWindowIcon(QIcon('res/icon.png'))
         grid = QGridLayout()
         self.btn_apply.clicked.connect(self.get_training_params)
-        self.training_dialog.setGeometry(845, 465, 230, 150)
+        self.training_dialog.setFixedSize(230, 150)
 
         grid.addWidget(self.training_params, 0, 0, 1, 2)
         grid.addWidget(self.separator_h, 1, 0, 1, 2)
