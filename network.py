@@ -39,6 +39,11 @@ class Network:
         src = Signal()
         src.signal.connect(callback_func)
         print("{ Training network for " + str(iterations) + " iterations and " + str(len(input_data)) + " samples }")
+        self.weights = [np.random.rand(self.neurons[0], self.input_size) - 0.5]
+        self.biases = [np.random.rand(self.neurons[0], 1)]
+        for i in range(self.layers - 1):
+            self.weights.append(np.random.rand(self.neurons[i + 1], self.neurons[i]) - 0.5)
+            self.biases.append(np.random.rand(self.neurons[i + 1], 1))
         activations = []
         errors = []
         derivatives = []
