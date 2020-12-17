@@ -20,7 +20,7 @@ class Network:
             self.weights.append(np.random.rand(self.neurons[i + 1], self.neurons[i]) - 0.5)
             self.biases.append(np.random.rand(self.neurons[i + 1], 1))
 
-    def fit(self, iterations, input_data, input_labels, ro=0.5, alpha=0.5) -> None:
+    def fit(self, iterations, input_data, input_labels, ro, alpha) -> None:
         """
         Trains network with given training data and corresponding labels
         @param iterations: Number of total iterations the networks
@@ -101,7 +101,7 @@ class Network:
         @param file_name: The file will be created in ./data/<file_name>.csv
         """
         # print("{ Saving weights to file " + file_name + ".csv }")
-        with open('data/' + str(file_name) + '.csv', 'ab') as f:
+        with open(file_name, 'ab') as f:
             for layer in range(self.layers):
                 np.savetxt(f, self.weights[layer], delimiter=',')
                 np.savetxt(f, self.biases[layer], delimiter=',')
@@ -113,13 +113,10 @@ class Network:
         """
         # print("{ Loading weights from file " + file_name + ".csv }")
         skip_header = 0
-        skip_footer = 2*sum(self.neurons)
         for layer in range(self.layers):
-            skip_footer -= self.neurons[layer]
-            self.weights[layer] = np.genfromtxt("data/" + str(file_name) + ".csv", delimiter=",",
-                                                skip_header=skip_header, skip_footer=skip_footer)
+            self.weights[layer] = np.genfromtxt(file_name, delimiter=",",
+                                                skip_header=skip_header, max_rows=self.weights[layer].shape[0])
             skip_header += self.neurons[layer]
-            skip_footer -= self.neurons[layer]
-            self.biases[layer] = np.genfromtxt("data/" + str(file_name) + ".csv", delimiter=",",
-                                               skip_header=skip_header, skip_footer=skip_footer).reshape((self.neurons[layer], 1))
+            self.biases[layer] = np.genfromtxt(file_name, delimiter=",", skip_header=skip_header,
+                                               max_rows=self.biases[layer].shape[0]).reshape((self.neurons[layer], 1))
             skip_header += self.neurons[layer]
