@@ -3,7 +3,7 @@ import cv2
 
 class Processing:
     @staticmethod
-    def extract_segments(image, draw_rectangles=False):
+    def extract_segments(image, draw_rectangles=False) -> list:
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         ret, thresh = cv2.threshold(gray, gray[0, 0] - 1, 255, cv2.THRESH_BINARY)
         edged = cv2.Canny(gray, 30, 200)

@@ -16,7 +16,7 @@ class Formula:
         self.image = cv2.imread(filename)
         self.segments = Processing.extract_segments(self.image, draw_rectangles=True)
 
-    def evaluate(self, network: Network):
+    def evaluate(self, network: Network) -> str:
         # print("( Evaluating formula using neural network )")
         self.formula = ""
         for segment in self.segments:
