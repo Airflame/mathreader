@@ -1,6 +1,13 @@
 import numpy as np
 import random
+
+from PyQt5.QtCore import QObject, pyqtSignal
+
 from functions import Functions
+
+
+class Signal(QObject):
+    signal = pyqtSignal(str)
 
 
 class Network:
@@ -20,7 +27,7 @@ class Network:
             self.weights.append(np.random.rand(self.neurons[i + 1], self.neurons[i]) - 0.5)
             self.biases.append(np.random.rand(self.neurons[i + 1], 1))
 
-    def fit(self, iterations, input_data, input_labels, ro, alpha) -> None:
+    def fit(self, iterations, input_data, input_labels, ro, alpha, callback_func) -> None:
         """
         Trains network with given training data and corresponding labels
         @param iterations: Number of total iterations the networks
@@ -29,6 +36,8 @@ class Network:
         @param ro:
         @param alpha:
         """
+        src = Signal()
+        src.signal.connect(callback_func)
         print("{ Training network for " + str(iterations) + " iterations and " + str(len(input_data)) + " samples }")
         activations = []
         errors = []
@@ -49,6 +58,9 @@ class Network:
             # if iteration % 500 == 0:
             #       self.progress = ((iteration / iterations)+ (500/ iterations))*100%
             #     print(iteration / iterations)
+            if iteration % (iterations / 100) == 0:
+                msg = str(iteration / iterations * 100)
+                src.signal.emit(msg)
             if iteration % len(input_data) == 0:
                 random.shuffle(samples)
             sample = samples[iteration % len(input_data)]
@@ -78,6 +90,8 @@ class Network:
                 self.weights[i] += diff_weights[i]
                 diff_biases[i] = ro * errors[i] + alpha * diff_biases[i]
                 self.biases[i] += diff_biases[i]
+        msg = str(iteration / iterations * 100)
+        src.signal.emit(msg)
 
     def evaluate(self, input_vector) -> int:
         """

@@ -1,3 +1,4 @@
+import threading
 from fonts import Fonts
 from network import Network
 from formula import Formula
@@ -127,8 +128,12 @@ class MathReader(QWidget):
 
     def training(self):
         self.open_training_dialog()
-        self.network.fit(iterations=self.iterations, input_data=self.fonts.data, input_labels=self.fonts.labels,
-                         ro=self.ro, alpha=self.alpha)
+        #self.network.fit(iterations=self.iterations, input_data=self.fonts.data, input_labels=self.fonts.labels,
+        #                 ro=self.ro, alpha=self.alpha)
+        t = threading.Thread(name='training', target=Network.fit, args=(self.network, self.iterations,
+                                                                        self.fonts.data, self.fonts.labels,
+                                                                        self.ro, self.alpha, self.set_progress_bar))
+        t.start()
         train_state = "Trained network for " + str(self.iterations) + " iterations and " + \
                       str(len(self.fonts.data)) + " samples"
         train_state += "\nNetwork successfully trained."
@@ -157,7 +162,6 @@ class MathReader(QWidget):
             self.formula.load(self.file_path)
             self.solved_formula.setText(self.formula.evaluate(self.network))
             self.label_image.setPixmap(QPixmap("data/_output.png").scaled(self.w, self.h, Qt.KeepAspectRatio))
-
         else:
             self.label_state.setText("Please train network or load weights first")
 
@@ -186,6 +190,9 @@ class MathReader(QWidget):
         self.ro = float(self.choose_rho_input.text())
         self.alpha = float(self.choose_alpha_input.text())
         self.training_dialog.close()
+
+    def set_progress_bar(self, progress):
+        self.loading.setValue(round(float(progress)))
 
 
 if __name__ == '__main__':
