@@ -5,6 +5,7 @@ class Processing:
     @staticmethod
     def extract_segments(image, draw_rectangles=False):
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        cv2.imwrite("data/_thresh.png", gray)
         edged = cv2.Canny(gray, 30, 200)
         contours, hierarchy = cv2.findContours(edged, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         bounding_boxes = [cv2.boundingRect(c) for c in contours]

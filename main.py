@@ -24,7 +24,7 @@ class MathReader(QWidget):
         self.network_ready = False
 
         self.setWindowTitle("MathReader")
-        self.setWindowIcon(QIcon('icon.png'))
+        self.setWindowIcon(QIcon('res/icon.png'))
         grid = QGridLayout()
         self.setGeometry(595, 290, 730, 500)
 
@@ -33,14 +33,14 @@ class MathReader(QWidget):
         label_math_reader.setMaximumHeight(50)
         label_math_reader.setAlignment(Qt.AlignCenter)
 
-        btn_save_weights = QPushButton("Save weights")
-        btn_save_weights.clicked.connect(self.save_weights)
-        btn_load_weights = QPushButton("Load weights")
-        btn_load_weights.clicked.connect(self.load_weights)
-        btn_train = QPushButton("Train")
-        btn_train.clicked.connect(self.training)
-        btn_browse = QPushButton("Browse")
-        btn_browse.clicked.connect(self.open_file)
+        self.btn_save_weights = QPushButton("Save weights")
+        self.btn_save_weights.clicked.connect(self.save_weights)
+        self.btn_load_weights = QPushButton("Load weights")
+        self.btn_load_weights.clicked.connect(self.load_weights)
+        self.btn_train = QPushButton("Train")
+        self.btn_train.clicked.connect(self.open_training_dialog)
+        self.btn_browse = QPushButton("Browse")
+        self.btn_browse.clicked.connect(self.open_file)
         self.btn_solve = QPushButton("Solve!")
         self.btn_solve.setEnabled(False)
         self.btn_solve.clicked.connect(self.solve_formula)
@@ -67,15 +67,12 @@ class MathReader(QWidget):
         self.separator_h = QFrame()
         self.separator_h.setFrameShape(QFrame.HLine)
         self.separator_h.setFrameShadow(QFrame.Sunken)
-        # separator_h2 = QFrame()
-        # separator_h2.setFrameShape(QFrame.HLine)
-        # separator_h2.setFrameShadow(QFrame.Sunken)
         separator_v = QFrame()
         separator_v.setFrameShape(QFrame.VLine)
         separator_v.setFrameShadow(QFrame.Sunken)
 
-        start_state = "[ Loading " + str(fonts_used) + " fonts ]"
-        start_state += "\n{ Initializing network with layers of sizes " + str(self.network.neurons) + " }"
+        start_state = "Loaded " + str(fonts_used) + " fonts"
+        start_state += ("\nInitializing network with layers of sizes " + str(self.network.neurons))
         self.label_state = QLabel(start_state)
         self.label_state.setStyleSheet("background-color: white")
         self.label_state.setAlignment(Qt.AlignCenter)
@@ -95,21 +92,20 @@ class MathReader(QWidget):
         self.btn_apply.setMaximumWidth(80)
 
         grid.addWidget(label_math_reader, 0, 0, 1, 1)
-        grid.addWidget(btn_train, 1, 0)
-        grid.addWidget(btn_save_weights, 2, 0)
-        grid.addWidget(btn_load_weights, 3, 0)
+        grid.addWidget(self.btn_train, 1, 0)
+        grid.addWidget(self.btn_save_weights, 2, 0)
+        grid.addWidget(self.btn_load_weights, 3, 0)
         grid.addWidget(self.btn_solve, 5, 0)
         grid.addWidget(separator_v, 0, 1, 10, 1)
 
         grid.addWidget(label_open_image, 0, 2, 1, 3)
         grid.addWidget(label_file, 1, 2, 1, 1)
         grid.addWidget(self.browsed_file, 1, 3, 1, 1)
-        grid.addWidget(btn_browse, 1, 4, 1, 1)
+        grid.addWidget(self.btn_browse, 1, 4, 1, 1)
         grid.addWidget(self.label_image, 2, 2, 7, 3)
         grid.addWidget(label_loading, 9, 2, Qt.AlignCenter)
         grid.addWidget(self.loading, 9, 3, 1, 2)
 
-        # grid.addWidget(separator_h2, 10, 0, 1, 5)
         grid.addWidget(label_solved, 10, 0, 1, 1)
         grid.addWidget(self.solved_formula, 11, 0, 1, 5)
         grid.addWidget(self.label_state, 12, 0, 1, 5)
@@ -125,20 +121,6 @@ class MathReader(QWidget):
         self.label_image.setPixmap(QPixmap(file_name).scaled(self.w, self.h, Qt.KeepAspectRatio))
         self.label_state.setText("Loaded formula from file " + file_name)
         self.btn_solve.setEnabled(True)
-
-    def training(self):
-        self.open_training_dialog()
-        #self.network.fit(iterations=self.iterations, input_data=self.fonts.data, input_labels=self.fonts.labels,
-        #                 ro=self.ro, alpha=self.alpha)
-        t = threading.Thread(name='training', target=Network.fit, args=(self.network, self.iterations,
-                                                                        self.fonts.data, self.fonts.labels,
-                                                                        self.ro, self.alpha, self.set_progress_bar))
-        t.start()
-        train_state = "Trained network for " + str(self.iterations) + " iterations and " + \
-                      str(len(self.fonts.data)) + " samples"
-        train_state += "\nNetwork successfully trained."
-        self.label_state.setText(train_state)
-        self.network_ready = True
 
     def save_weights(self):
         file_name, _ = QFileDialog.getSaveFileName(self, 'Save file', filter="csv(*.csv)")
@@ -158,19 +140,20 @@ class MathReader(QWidget):
 
     def solve_formula(self):
         if self.network_ready:
-            self.label_state.setText("Evaluating formula using neural network")
+            self.label_state.setText("Evaluating formula using neural network.")
             self.formula.load(self.file_path)
             self.solved_formula.setText(self.formula.evaluate(self.network))
             self.label_image.setPixmap(QPixmap("data/_output.png").scaled(self.w, self.h, Qt.KeepAspectRatio))
         else:
-            self.label_state.setText("Please train network or load weights first")
+            self.label_state.setText("Please train network or load weights first.")
 
     def open_training_dialog(self):
         self.training_dialog.setModal(True)
         self.training_dialog.setWindowTitle("Training Dialog")
-        self.training_dialog.setWindowIcon(QIcon('icon.png'))
+        self.training_dialog.setWindowIcon(QIcon('res/icon.png'))
         grid = QGridLayout()
         self.btn_apply.clicked.connect(self.get_training_params)
+        self.training_dialog.setGeometry(845, 465, 230, 150)
 
         grid.addWidget(self.training_params, 0, 0, 1, 2)
         grid.addWidget(self.separator_h, 1, 0, 1, 2)
@@ -183,6 +166,7 @@ class MathReader(QWidget):
         grid.addWidget(self.btn_apply, 5, 0, 1, 2, Qt.AlignCenter)
 
         self.training_dialog.setLayout(grid)
+
         self.training_dialog.exec()
 
     def get_training_params(self):
@@ -190,9 +174,28 @@ class MathReader(QWidget):
         self.ro = float(self.choose_rho_input.text())
         self.alpha = float(self.choose_alpha_input.text())
         self.training_dialog.close()
+        t = threading.Thread(name='training', target=Network.fit, args=(self.network, self.iterations,
+                                                                        self.fonts.data, self.fonts.labels,
+                                                                        self.ro, self.alpha, self.set_progress_bar))
+        t.start()
+        self.label_state.setText("Training network for " + str(self.iterations) + " iterations and " +
+                                 str(len(self.fonts.data)) + " samples.")
+        self.network_ready = True
 
     def set_progress_bar(self, progress):
         self.loading.setValue(round(float(progress)))
+        value = self.loading.value()
+        if value < 100:
+            self.btn_train.setEnabled(False)
+            self.btn_load_weights.setEnabled(False)
+            self.btn_save_weights.setEnabled(False)
+            self.btn_browse.setEnabled(False)
+        else:
+            self.label_state.setText("Network successfully trained.")
+            self.btn_train.setEnabled(True)
+            self.btn_load_weights.setEnabled(True)
+            self.btn_save_weights.setEnabled(True)
+            self.btn_browse.setEnabled(True)
 
 
 if __name__ == '__main__':
