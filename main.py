@@ -15,7 +15,7 @@ class MathReader(QWidget):
         self.iterations = 10000
         self.ro = 0.5
         self.alpha = 0.5
-        self.fonts = Fonts(2)
+        self.fonts = Fonts(3)
         fonts_used = self.fonts.fonts
         self.fonts.load()
         self.network = Network(neurons=(35, 25, len(Constants.symbols)), input_size=21 * 14)
