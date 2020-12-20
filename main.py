@@ -193,8 +193,8 @@ class MathReader(QWidget):
         self.alpha = float(self.choose_alpha_input.text())
         self.training_dialog.close()
         t = threading.Thread(target=self.network.fit, args=(self.iterations,
-                                                                        self.fonts.data, self.fonts.labels,
-                                                                        self.ro, self.alpha, self.set_progress_bar))
+                                                            self.fonts.data, self.fonts.labels,
+                                                            self.ro, self.alpha, self.set_progress_bar))
         t.start()
         self.label_state.setText("Training network for " + str(self.iterations) + " iterations and " +
                                  str(len(self.fonts.data)) + " samples.")
@@ -221,7 +221,6 @@ class MathReader(QWidget):
 
 
 if __name__ == '__main__':
-    import sys
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
     window = MathReader()
