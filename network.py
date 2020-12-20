@@ -17,7 +17,6 @@ class Network:
         @param neurons: Tuple containing the number of neurons in consecutive layers
         @param input_size: Size of input vectors
         """
-        # print("{ Initializing network with layers of sizes " + str(neurons) + " }")
         self.neurons = neurons
         self.layers = len(neurons)
         self.input_size = input_size
@@ -33,12 +32,12 @@ class Network:
         @param iterations: Number of total iterations the networks
         @param input_data: List of training data vectors with shape (input_size, 1)
         @param input_labels: List of training labels with shape (neurons[-1], 1)
-        @param ro:
-        @param alpha:
+        @param ro: Training parameter which determines how fast the weights and biases update
+        @param alpha: Training parameter which determines the application of momentum algorithm
+        @param callback_func: Reference to function which updates progress bar during training
         """
         src = Signal()
         src.signal.connect(callback_func)
-        print("{ Training network for " + str(iterations) + " iterations and " + str(len(input_data)) + " samples }")
         self.weights = [np.random.rand(self.neurons[0], self.input_size) - 0.5]
         self.biases = [np.random.rand(self.neurons[0], 1)]
         for i in range(self.layers - 1):
@@ -60,9 +59,6 @@ class Network:
         samples = list(range(len(input_data)))
 
         for iteration in range(iterations):
-            # if iteration % 500 == 0:
-            #       self.progress = ((iteration / iterations)+ (500/ iterations))*100%
-            #     print(iteration / iterations)
             if iteration % (iterations / 100) == 0:
                 msg = str(iteration / iterations * 100)
                 src.signal.emit(msg)
@@ -110,8 +106,6 @@ class Network:
             activations = Functions.sigmoid(self.weights[i] @ activations + self.biases[i])
 
         index = int(activations.argmax(axis=0))
-        print(str(int(activations.argmax(axis=0))) + ": " + str(float(activations[index]) * 100))
-        print()
         return index
 
     def save(self, file_name) -> None:
@@ -119,7 +113,6 @@ class Network:
         Saves network parameters to a csv file.
         @param file_name: The file will be created in ./data/<file_name>.csv
         """
-        # print("{ Saving weights to file " + file_name + ".csv }")
         with open(file_name, 'ab') as f:
             for layer in range(self.layers):
                 np.savetxt(f, self.weights[layer], delimiter=',')
@@ -130,7 +123,6 @@ class Network:
         Loads network parameters from a csv file.
         @param file_name: The file will be loaded from ./data/<file_name>.csv
         """
-        # print("{ Loading weights from file " + file_name + ".csv }")
         skip_header = 0
         for layer in range(self.layers):
             self.weights[layer] = np.genfromtxt(file_name, delimiter=",",

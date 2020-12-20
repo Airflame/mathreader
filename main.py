@@ -132,6 +132,9 @@ class MathReader(QWidget):
         self.training_dialog.setLayout(grid)
 
     def open_file(self) -> None:
+        """
+        Opens a file dialog used to load image with a mathematical expression
+        """
         file_name, _ = QFileDialog.getOpenFileName(self, 'Open file')
         self.browsed_file.setText(file_name)
         self.file_path = file_name
@@ -142,6 +145,9 @@ class MathReader(QWidget):
         self.btn_solve.setEnabled(True)
 
     def save_weights(self) -> None:
+        """
+        Opens a file dialog used to save network parameters to a .csv file
+        """
         file_name, _ = QFileDialog.getSaveFileName(self, 'Save file', filter="csv(*.csv)")
         if file_name != '':
             file = open(file_name, 'w')
@@ -151,6 +157,9 @@ class MathReader(QWidget):
             self.label_state.setText("Saving weights to file " + file_name)
 
     def load_weights(self) -> None:
+        """
+        Opens a file dialog used to load network parameters from a .csv file
+        """
         file_name, _ = QFileDialog.getOpenFileName(self, 'Open file', filter="csv(*.csv)")
         if file_name != '':
             self.network.load(file_name)
@@ -158,6 +167,9 @@ class MathReader(QWidget):
             self.network_ready = True
 
     def solve_formula(self) -> None:
+        """
+        Solves the formula recognized in the image by the neural network
+        """
         if self.network_ready:
             self.label_state.setText("Evaluating formula using neural network.")
             self.formula.load(self.file_path)
@@ -167,9 +179,15 @@ class MathReader(QWidget):
             self.label_state.setText("Please train network or load weights first.")
 
     def open_training_dialog(self) -> None:
+        """
+        Opens the dialog before training in which the user sets the number of iterations and additional parameters.
+        """
         self.training_dialog.exec()
 
     def get_training_params(self) -> None:
+        """
+        Retrieves the training parameters from closed dialog and starts training with
+        """
         self.iterations = int(self.choose_iterations_input.text())
         self.ro = float(self.choose_rho_input.text())
         self.alpha = float(self.choose_alpha_input.text())
@@ -183,6 +201,10 @@ class MathReader(QWidget):
         self.network_ready = True
 
     def set_progress_bar(self, progress) -> None:
+        """
+        Updates the training progress bar with data from neural network
+        @param progress: Integer in range from 0 to 100 representing training progress in percentage
+        """
         self.loading.setValue(round(float(progress)))
         value = self.loading.value()
         if value < 100:

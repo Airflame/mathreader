@@ -12,17 +12,22 @@ class Formula:
         self.formula = ""
 
     def load(self, filename) -> None:
-        # print("( Loading formula from file " + filename + " )")
+        """
+        Loads an image containing a mathematical expression and extracts individual symbols from it
+        @param filename: Path to a file
+        """
         self.image = cv2.imread(filename)
         self.segments = Processing.extract_segments(self.image, draw_rectangles=True)
 
     def evaluate(self, network: Network) -> str:
-        # print("( Evaluating formula using neural network )")
+        """
+        Uses a neural network to recognize symbols and calculate the result
+        @param network: Network used for evaluation
+        @return: Solved formula
+        """
         self.formula = ""
         for segment in self.segments:
             self.formula += Constants.symbols[network.evaluate(input_vector=segment)]
-        # print(self.formula)
-        # print(eval(self.formula))
         self.solved = self.formula
         try:
             self.solved += (" = " + str(eval(self.formula)))

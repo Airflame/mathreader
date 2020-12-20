@@ -4,6 +4,12 @@ import cv2
 class Processing:
     @staticmethod
     def extract_segments(image, draw_rectangles=False) -> list:
+        """
+        Divides an image into individual symbols and rescales them
+        @param image: Image containing a mathematical expression
+        @param draw_rectangles: Saves the image with rectangles drawn around contours if set to true
+        @return: List containing symbols extracted from an image
+        """
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         ret, thresh = cv2.threshold(gray, gray[0, 0] - 1, 255, cv2.THRESH_BINARY)
         edged = cv2.Canny(gray, 30, 200)
